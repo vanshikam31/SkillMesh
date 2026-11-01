@@ -1,0 +1,49 @@
+id,name,experience,offered,wanted,availability,rating
+u01,Aarav Jain,4,excel analytics|fastapi|guitar,french language|presentation skills,Wed-M|Thu-M,3.7
+u02,Ananya Joshi,3,presentation skills|data structures,c++|figma|french,Mon-M|Mon-A|Mon-E|Tue-M|Thu-A|Fri-A|Sat-A|Sun-A,4.2
+u03,Kabir Joshi,1,pandas analysis|py scripting,seo basics|guitar,Mon-A|Tue-M|Tue-E|Thu-M|Thu-A|Fri-M|Fri-E|Sat-M|Sat-A|Sat-E|Sun-E,3.2
+u04,Meera Mehta,4,ui design|reactjs,acoustic guitar|git and github,Mon-E|Tue-M|Tue-A|Fri-A|Fri-E|Sat-M|Sun-A|Sun-E,4.5
+u05,Rohan Rathore,2,ui/ux design|java|blog writing,machine learning|photoshop|react,Mon-A|Mon-E|Tue-A|Wed-M|Wed-A|Thu-A|Fri-E,3.1
+u06,Isha Gupta,4,video editing|french|data analysis,git|digital marketing|acoustic guitar,Mon-A|Tue-M|Wed-A|Fri-M|Fri-A|Sat-A,4.1
+u07,Arjun Gupta,5,fastapi|data analysis|photoshop,presentation skills|algorithms|acoustic guitar,Tue-E|Fri-A|Sat-M|Sun-M,3.6
+u08,Diya Gupta,2,acoustic guitar|pandas analysis|french,python|content writing|data structures,Mon-M|Mon-E|Wed-A|Thu-M|Thu-E|Fri-A|Sat-A|Sun-M|Sun-E,3.6
+u09,Vihaan Singh,5,core java|sql,cpp programming|french,Tue-A|Tue-E|Wed-M|Wed-A|Thu-A|Fri-M|Sat-M|Sat-A|Sun-M,3.6
+u10,Sanya Mehta,5,c++|acoustic guitar|french language,js|presentation skills|react frontend,Tue-E|Thu-M|Fri-M|Sat-M|Sat-E,3.1
+u11,Karan Singh,2,photoshop|acoustic guitar|presentation skills,dsa|javascript|react frontend,Mon-E|Tue-A|Tue-E|Wed-E|Thu-M|Thu-E|Fri-M|Sun-M|Sun-A,4.3
+u12,Nisha Gupta,4,blog writing|ui/ux design|scikit-learn modeling,embedded basics|digital marketing,Tue-M|Tue-A|Thu-M|Thu-A|Fri-M,3.0
+u13,Yash Mehta,1,pandas analysis|machine learning|figma,python programming|c++,Mon-M|Tue-M|Wed-M|Wed-E|Fri-E|Sat-M|Sat-A,3.9
+u14,Pooja Jain,2,c++|blog writing,scikit-learn modeling|ui design,Mon-E|Tue-M|Tue-E|Wed-E|Thu-E|Sat-M,3.3
+u15,Aditya Saini,4,premiere pro|dsa,french language|content writing,Mon-A|Fri-M|Fri-A|Sat-A,4.7
+u16,Riya Agarwal,4,py scripting|digital marketing|content writing,reactjs|presentation skills|core java,Tue-M|Tue-A|Fri-M|Sat-A,3.5
+u17,Manav Jain,2,react|machine learning|ui/ux design,javascript|fastapi,Tue-M|Tue-A|Sun-A|Sun-E,4.9
+u18,Tanvi Jain,1,sql|arduino,py scripting|ml|video editing,Tue-E|Thu-A|Sun-A|Sun-E,3.8
+u19,Harsh Agarwal,5,ui design|scikit-learn modeling|core java,photoshop|guitar,Mon-A|Tue-E|Thu-M|Thu-E|Sat-M|Sun-M|Sun-A|Sun-E,3.9
+u20,Kavya Joshi,5,data structures|java|react,ui/ux design|cpp programming,Fri-M|Fri-E|Sat-A|Sun-M,3.3
+u21,Dev Sharma,5,french|c++,content writing|core java|javascript,Mon-M|Mon-A|Tue-A|Tue-E|Wed-M|Wed-A|Thu-E|Fri-A|Fri-E,3.1
+u22,Simran Gupta,4,postgres queries|javascript,presentation skills|ml|pandas analysis,Fri-A|Sun-M|Sun-A|Sun-E,3.1
+u23,Nikhil Agarwal,4,js|python|acoustic guitar,ui design|content writing|pandas analysis,Mon-A|Tue-A|Wed-M|Wed-E|Fri-A|Sun-A,4.1
+u24,Aisha Agarwal,3,python rest apis|sql|french,photoshop|figma|py scripting,Tue-M|Wed-E|Sun-A,3.7
+u25,Aarav Agarwal,3,py scripting|reactjs,machine learning|sql databases,Tue-E|Wed-M|Wed-A|Wed-E|Thu-M|Thu-E|Fri-M|Sat-M,4.8
+u26,Ananya Sharma,2,blog writing|react frontend,git and github|ml,Mon-A|Tue-M|Tue-E|Wed-A|Thu-A|Fri-A|Fri-E|Sat-A,3.9
+u27,Kabir Agarwal,4,arduino|seo basics|premiere pro,pandas analysis|reactjs,Mon-A|Mon-E|Tue-E|Fri-A|Sat-M,3.8
+u28,Meera Mehta,1,sql databases|dsa|ui/ux design,video editing|acoustic guitar|digital marketing,Mon-E|Wed-M|Wed-E|Thu-A|Thu-E|Fri-M|Fri-A|Sun-E,4.2
+u29,Rohan Joshi,5,premiere pro|pandas analysis|fastapi,data structures|photoshop|arduino,Tue-E|Wed-M|Wed-A|Sat-E,3.2
+u30,Isha Verma,1,seo basics|dsa,javascript basics|postgres queries|acoustic guitar,Mon-A|Wed-E|Thu-M|Thu-E|Fri-M|Fri-A|Sun-A|Sun-E,4.2
+u31,Arjun Jain,5,react|git and github|py scripting,video editing|ml|core java,Mon-M|Thu-M|Fri-M|Fri-E|Sun-M|Sun-E,3.9
+u32,Diya Rathore,5,machine learning|digital marketing|sql,public speaking|javascript|excel analytics,Mon-A|Wed-M|Thu-A|Fri-M|Sun-A,3.3
+u33,Vihaan Verma,5,sql|french|presentation skills,reactjs|java|ml,Tue-M|Thu-A|Sun-M|Sun-A,3.6
+u34,Sanya Chauhan,5,git and github|ui design|presentation skills,ml|embedded basics|french,Mon-E|Tue-A|Tue-E|Wed-E|Thu-M|Fri-A|Sat-M|Sat-E|Sun-A|Sun-E,4.1
+u35,Karan Rathore,4,video editing|postgres queries,git|ml|french language,Fri-E|Sat-M,4.3
+u36,Nisha Chauhan,1,pandas analysis|scikit-learn modeling|arduino,video editing|figma,Mon-E|Tue-E|Wed-A|Fri-E|Sat-E,4.8
+u37,Yash Agarwal,3,git|ui/ux design,python rest apis|video editing,Mon-M|Mon-A|Tue-M|Wed-M|Wed-A|Thu-A|Sat-M|Sun-A,4.1
+u38,Pooja Chauhan,1,public speaking|python,ui design|git and github|cpp programming,Mon-A|Tue-A|Thu-E|Sat-A,4.9
+u39,Aditya Joshi,4,react|french,presentation skills|premiere pro,Mon-M|Wed-M|Wed-E|Thu-A|Fri-M|Fri-A|Sat-A|Sat-E|Sun-A|Sun-E,4.7
+u40,Riya Agarwal,4,digital marketing|acoustic guitar,fastapi|public speaking|sql databases,Mon-E|Wed-M|Thu-M|Thu-A|Fri-E|Sat-E,4.3
+u41,Manav Verma,4,cpp programming|ml,photoshop|python programming,Mon-E|Tue-M|Wed-A|Thu-E|Fri-E|Sat-A|Sat-E|Sun-M,4.7
+u42,Tanvi Sharma,4,machine learning|presentation skills,fastapi|core java,Wed-M|Thu-E|Fri-E|Sun-M|Sun-A,4.8
+u43,Harsh Verma,3,french|dsa,js|reactjs|postgres queries,Mon-M|Mon-A|Tue-A|Wed-M|Thu-A|Thu-E|Fri-M,3.4
+u44,Kavya Joshi,4,core java|reactjs|premiere pro,pandas analysis|french,Mon-M|Wed-E|Thu-E|Fri-M|Fri-E|Sat-A,4.9
+u45,Dev Rathore,4,java|python rest apis,digital marketing|photo editing,Mon-A|Tue-E|Sun-E,4.7
+u46,Simran Chauhan,3,public speaking|react,sql|arduino|dsa,Mon-M|Tue-M|Tue-A|Fri-E|Sat-M|Sat-E|Sun-M,3.6
+u47,Nikhil Singh,1,arduino|french|core java,photo editing|video editing|public speaking,Mon-M|Mon-A|Wed-E|Thu-E|Fri-M|Fri-A|Fri-E|Sat-M,4.3
+u48,Aisha Mehta,3,embedded basics|postgres queries|cpp programming,video editing|fastapi,Mon-A|Mon-E|Thu-E|Fri-A,4.2

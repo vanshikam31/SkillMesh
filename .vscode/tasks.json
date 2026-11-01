@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Backend: run API", "type": "shell", "command": "cd backend && uvicorn app.main:app --reload --port 8000", "problemMatcher": [] },
+    { "label": "Frontend: run dev server", "type": "shell", "command": "cd frontend && npm run dev", "problemMatcher": [] },
+    { "label": "Backend: seed sample students", "type": "shell", "command": "python backend/seed.py", "problemMatcher": [] },
+    { "label": "ML: run evaluation", "type": "shell", "command": "python ml/run_evaluation.py", "problemMatcher": [] }
+  ]
+}

@@ -1,0 +1,15 @@
+README.md
+pyproject.toml
+skillmesh_ml/__init__.py
+skillmesh_ml/evaluation.py
+skillmesh_ml/matcher.py
+skillmesh_ml/preprocessing.py
+skillmesh_ml/scoring.py
+skillmesh_ml/similarity.py
+skillmesh_ml/synthetic_data.py
+skillmesh_ml.egg-info/PKG-INFO
+skillmesh_ml.egg-info/SOURCES.txt
+skillmesh_ml.egg-info/dependency_links.txt
+skillmesh_ml.egg-info/requires.txt
+skillmesh_ml.egg-info/top_level.txt
+tests/test_matcher.py
