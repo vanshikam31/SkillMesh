@@ -18,3 +18,11 @@ for r in (auth, profile, recommendations, requests, sessions, matching):
 @app.get("/health", tags=["meta"])
 def health():
     return {"status": "ok"}
+
+@app.get("/")
+def root():
+    return {
+        "message": "Welcome to SkillMesh API",
+        "status": "running",
+        "docs": "/docs"
+    }
