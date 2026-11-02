@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || "https://skillmesh-shur.onrender.com" });
+const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || "https://skillmesh-frontend.onrender.com." });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("skillmesh_token");
