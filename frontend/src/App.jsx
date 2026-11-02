@@ -8,6 +8,7 @@ import Discover from "./pages/Discover";
 import HowItWorks from "./pages/HowItWorks";
 import Landing from "./pages/Landing";
 import Requests from "./pages/Requests";
+import ResetPassword from "./pages/ResetPassword";
 import Sessions from "./pages/Sessions";
 import Setup from "./pages/Setup";
 
@@ -42,6 +43,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/setup" element={<Protected needsSetup={false}><Setup /></Protected>} />
       <Route path="/discover" element={<Protected><AppShell><Discover /></AppShell></Protected>} />
       <Route path="/requests" element={<Protected><AppShell>{({ requests, respond }) => <Requests requests={requests} onRespond={respond} />}</AppShell></Protected>} />

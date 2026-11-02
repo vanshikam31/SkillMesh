@@ -1,15 +1,15 @@
 :root{
-  --page:#FAEFED;--bg:#F7E6E3;--surface:#FFFFFF;--ink:#0F3340;--muted:#4D6B75;--line:#CFE0E4;--edge:#0F3340;
-  --teal:#006078;--teal-soft:#D5E8EC;--amber:#a1dada;--amber-soft:#FFD4D1;--coral:#bbeeda;--on-accent:#0F3340;
+  --page:#FAEFED;--bg:#E6F3F4;--surface:#FFFFFF;--ink:#0F3340;--muted:#4D6B75;--line:#CFE0E4;--edge:#0F3340;
+  --teal:#006078;--teal-soft:#D5E8EC;--amber:#7FCFD4;--amber-soft:#C8EEF0;--coral:#7FCFD4;--on-accent:#0F3340;
   --head:"Bricolage Grotesque","Trebuchet MS",Georgia,sans-serif;
   --body:"Instrument Sans","Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){--page:#0A2A34;--bg:#14414F;--surface:#0F3641;--ink:#FAEFED;--muted:#A9CBD2;--line:#285566;--edge:#04151B;--teal:#82BAC4;--teal-soft:#1F5361;--amber-soft:#5A2F2D}
+  :root:not([data-theme="light"]){--page:#0A2A34;--bg:#14414F;--surface:#0F3641;--ink:#FAEFED;--muted:#A9CBD2;--line:#285566;--edge:#04151B;--teal:#82BAC4;--teal-soft:#1F5361;--amber-soft:#1E5A66}
 }
-:root[data-theme="dark"]{--page:#0A2A34;--bg:#14414F;--surface:#0F3641;--ink:#FAEFED;--muted:#A9CBD2;--line:#285566;--edge:#04151B;--teal:#82BAC4;--teal-soft:#1F5361;--amber-soft:#5A2F2D}
+:root[data-theme="dark"]{--page:#0A2A34;--bg:#14414F;--surface:#0F3641;--ink:#FAEFED;--muted:#A9CBD2;--line:#285566;--edge:#04151B;--teal:#82BAC4;--teal-soft:#1F5361;--amber-soft:#1E5A66}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background-color:var(--page);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
@@ -62,7 +62,7 @@ main{max-width:1120px;margin:0 auto;padding:12px 20px 56px}
 .meshcard svg{width:100%;height:auto;display:block;max-height:430px}
 .ringline{stroke:var(--line);stroke-width:1.5;stroke-dasharray:2 6;stroke-linecap:round}
 .spoke{stroke:var(--teal);opacity:.5;stroke-linecap:round}
-.spoke.on{opacity:1;stroke:var(--coral)}
+.spoke.on{opacity:1;stroke:var(--ink)}
 .node{cursor:pointer}
 .node circle{fill:var(--surface);stroke:var(--edge);stroke-width:3}
 .node.conn circle{fill:var(--amber-soft)}
@@ -135,8 +135,8 @@ code{background:var(--amber);color:var(--on-accent);padding:1px 6px;border-radiu
 .seg button{border:0;background:none;border-radius:10px;padding:7px;font-weight:700}
 .seg button[aria-pressed="true"]{background:var(--amber);color:var(--on-accent)}
 .err{min-height:1.4em;margin:10px 0 4px;color:#B3261E;font-weight:600;font-size:.92rem}
-:root[data-theme="dark"] .err{color:#FFB4AB}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#FFB4AB}}
+:root[data-theme="dark"] .err{color:#FFD27F}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .err{color:#FFD27F}}
 .btn.wide{width:100%;margin-top:8px}
 .setup{max-width:640px;margin:8px auto 0}
 .field input[type=password]{display:block;width:100%;margin-top:6px;padding:9px 12px;border:2px solid var(--edge);border-radius:12px;background:var(--bg);font-weight:400}
@@ -146,3 +146,15 @@ code{background:var(--amber);color:var(--on-accent);padding:1px 6px;border-radiu
 
 .tab[aria-current="page"]{background:var(--amber);color:var(--on-accent);border-color:var(--edge);box-shadow:3px 3px 0 var(--edge)}
 a.tab,a.btn{text-decoration:none;display:inline-block;color:inherit}
+
+/* update 1: tag colors without pink, auth extras */
+.tag{background:var(--teal-soft);color:var(--ink)}
+.tag.accepted{background:var(--amber);color:var(--on-accent)}
+.tag.declined{background:transparent;color:var(--muted);border-style:dashed}
+.err{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.link-btn{background:none;border:0;padding:2px 0;color:var(--teal);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.link-btn:hover{color:var(--ink)}
+.auth .below{display:flex;justify-content:space-between;gap:10px;margin-top:12px;font-size:.92rem}
+.ok{margin:8px 0 14px;padding:10px 12px;border:2px solid var(--edge);border-radius:12px;background:var(--teal-soft);font-weight:600}
+.devbox{margin:6px 0 12px;padding:10px 12px;border:2px dashed var(--edge);border-radius:12px;font-size:.9rem}
+.devbox p{margin:0 0 8px}

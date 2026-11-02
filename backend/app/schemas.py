@@ -86,3 +86,12 @@ class ScheduleIn(BaseModel):
 class RatingIn(BaseModel):
     score: int = Field(ge=1, le=5)
     feedback: str = Field(default="", max_length=500)
+
+
+class ForgotIn(BaseModel):
+    email: EmailStr
+
+
+class ResetIn(BaseModel):
+    token: str
+    new_password: str = Field(min_length=6, max_length=72)

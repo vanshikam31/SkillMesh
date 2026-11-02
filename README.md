@@ -84,30 +84,31 @@ DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/skillmesh
 ```
 Tables are created automatically on startup. Run `python backend/seed.py` again to fill the new database.
 
-## 4. Deploy (free tiers)
+## 4. Deploy (all free)
 
-**Push to GitHub first**
-```
-git init
-git add .
-git commit -m "SkillMesh"
-git branch -M main
-git remote add origin https://github.com/YOUR-USER/skillmesh.git
-git push -u origin main
-```
+Database on **Neon**, backend on **Render**, frontend on **Vercel**. (Render's free PostgreSQL is deleted after 30 days, so Neon is used instead.)
 
-**Backend + database on Render**
-1. render.com > New > Blueprint > pick your repo. It reads `render.yaml` and creates the API and a PostgreSQL database.
-2. After the first deploy, open the service > Environment and set `CORS_ORIGINS` to your Vercel URL (step below). Redeploy.
-3. Copy the API URL, for example `https://skillmesh-api.onrender.com`. Check `/health`.
-4. Optional sample data: Render shell > `python backend/seed.py`.
+1. **Push to GitHub:** `git add .`, `git commit -m "Ready for deploy"`, `git push`.
+2. **Neon:** create a project at neon.com and copy its connection string (`postgresql://...?sslmode=require`).
+3. **Render:** New > Web Service (not Blueprint) > pick the repo. Leave Root Directory empty.
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - Environment: `DATABASE_URL` (Neon string), `SECRET_KEY` (long random text), `PYTHON_VERSION=3.12.3`,
+     `CORS_ORIGINS` and `FRONTEND_URL` (your Vercel URL, set after step 5), `SHOW_RESET_LINK`.
+   - Check `https://YOUR-API.onrender.com/health`.
+4. **Sample data:** on your computer (venv active) run
+   `$env:DATABASE_URL="NEON-STRING"` then `python backend/seed.py` (Mac/Linux: `DATABASE_URL="NEON-STRING" python backend/seed.py`).
+5. **Vercel:** New Project > same repo > Root Directory `frontend` > environment variable `VITE_API_URL` = your Render URL (no trailing slash).
+6. Put the Vercel URL into Render's `CORS_ORIGINS` and `FRONTEND_URL` (no trailing slash). Render redeploys by itself.
 
-**Frontend on Vercel**
-1. vercel.com > Add New > Project > pick the repo, set **Root Directory** to `frontend` (Vite is detected automatically).
-2. Add environment variable `VITE_API_URL` = your Render API URL (no trailing slash). Deploy.
-3. Put the Vercel URL into Render's `CORS_ORIGINS`.
+Free Render services sleep after 15 minutes without traffic, so the first request after a break takes about a minute.
 
-Free Render services sleep when idle, so the first request after a break can take about 30 seconds.
+## 4b. Forgot password (email reset link)
+
+On the sign in screen, **Forgot password?** asks for the email and creates a one-time link (valid 30 minutes) that opens `/reset-password`.
+- **While developing:** leave the `SMTP_*` values empty in `backend/.env`. The link then appears on the screen (and in the backend terminal), so you can test without email.
+- **For real emails:** fill `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` in `backend/.env`. With Gmail, create an App Password at https://myaccount.google.com/apppasswords and use `smtp.gmail.com`, port `587`.
+- **On Render:** set `FRONTEND_URL` to your Vercel URL, add the same `SMTP_*` variables, and set `SHOW_RESET_LINK=false`.
 
 ## 5. Team workflow (Git)
 

@@ -48,3 +48,22 @@ def test_auth_required_and_matching_endpoints():
     assert client.get("/recommendations").status_code == 401
     assert client.get("/matching/evaluation?k=3").json()["skillmesh"] > 0
     assert client.get("/matching/similarity?a=js&b=javascript").json()["is_match"]
+
+
+def test_forgot_and_reset_password():
+    h = signup("Riya", "riya@example.com")
+    # unknown email gets the same generic answer and no link
+    unknown = client.post("/auth/forgot-password", json={"email": "nobody@example.com"}).json()
+    assert "dev_reset_link" not in unknown and unknown["message"]
+
+    link = client.post("/auth/forgot-password", json={"email": "riya@example.com"}).json()["dev_reset_link"]
+    token = link.split("token=")[1]
+    # a reset token must not work as a login token
+    assert client.get("/auth/me", headers={"Authorization": "Bearer " + token}).status_code == 401
+
+    assert client.post("/auth/reset-password", json={"token": token, "new_password": "newsecret"}).status_code == 200
+    assert client.post("/auth/login", json={"email": "riya@example.com", "password": "secret1"}).status_code == 401
+    assert client.post("/auth/login", json={"email": "riya@example.com", "password": "newsecret"}).status_code == 200
+    # the link works only once
+    assert client.post("/auth/reset-password", json={"token": token, "new_password": "another1"}).status_code == 400
+    assert client.post("/auth/reset-password", json={"token": "garbage", "new_password": "another1"}).status_code == 400
