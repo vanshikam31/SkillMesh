@@ -13,7 +13,7 @@ def ml_profile(u: models.User) -> dict:
 
 def peer_out(u: models.User) -> schemas.PeerOut:
     return schemas.PeerOut(id=u.id, name=u.name, experience=u.experience, rating=round(u.rating_avg, 1),
-                           rating_count=u.rating_count, offered=[s.name for s in u.offered], wanted=[s.name for s in u.wanted])
+                           rating_count=u.rating_count, offered=[s.name for s in u.offered], wanted=[s.name for s in u.wanted], is_sample=bool(u.is_sample))
 
 
 def profile_out(u: models.User) -> schemas.ProfileOut:

@@ -9,10 +9,12 @@ from skillmesh_ml.synthetic_data import generate_users  # noqa: E402
 
 from app import models  # noqa: E402
 from app.database import Base, SessionLocal, engine  # noqa: E402
+from app.migrate import ensure_schema  # noqa: E402
 from app.security import hash_password  # noqa: E402
 from app.services import get_or_create_skills  # noqa: E402
 
 Base.metadata.create_all(bind=engine)
+ensure_schema()
 db = SessionLocal()
 pw = hash_password("password123")
 created = 0
@@ -21,7 +23,7 @@ for u in generate_users():
     if db.query(models.User).filter_by(email=email).first():
         continue
     db.add(models.User(name=u["name"], email=email, password_hash=pw, experience=u["experience"], availability=u["availability"],
-                       setup_done=True, rating_avg=u["rating"], rating_count=u["rating_count"],
+                       setup_done=True, is_sample=True, rating_avg=u["rating"], rating_count=u["rating_count"],
                        offered=get_or_create_skills(db, u["offered"]), wanted=get_or_create_skills(db, u["wanted"])))
     db.flush()
     created += 1

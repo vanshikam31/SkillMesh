@@ -35,6 +35,7 @@ class User(Base):
     experience: Mapped[int] = mapped_column(Integer, default=2)          # 1 beginner ... 5 expert
     availability: Mapped[list] = mapped_column(JSON, default=list)       # e.g. ["Mon-E", "Sat-A"]
     setup_done: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_sample: Mapped[bool] = mapped_column(Boolean, default=False)      # True for demo students created by seed.py
     rating_avg: Mapped[float] = mapped_column(Float, default=3.5)
     rating_count: Mapped[int] = mapped_column(Integer, default=0)
     offered = relationship("Skill", secondary=user_skills_offered)

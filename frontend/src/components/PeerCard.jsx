@@ -14,7 +14,7 @@ export default function PeerCard({ match, selected, onSend }) {
       <div className="pico">{initials(p.name)}</div>
       <div className="pbody">
         <div className="phead">
-          <div><h3>{p.name}</h3><p className="sub">{EXP[p.experience]}. Rated {p.rating.toFixed(1)} from {p.rating_count} sessions</p></div>
+          <div><h3>{p.name}{p.is_sample && <span className="tag" style={{ marginLeft: 8, fontSize: ".75rem" }}>Sample</span>}</h3><p className="sub">{EXP[p.experience]}. Rated {p.rating.toFixed(1)} from {p.rating_count} sessions</p></div>
           <div className="pct" aria-label={`${pct} percent match`}><strong>{pct}%</strong><span>match</span></div>
         </div>
         <ul className="why">{match.reasons.map((r) => <li key={r}>{r}</li>)}</ul>

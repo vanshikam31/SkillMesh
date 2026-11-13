@@ -40,6 +40,7 @@ class PeerOut(BaseModel):
     rating_count: int
     offered: list[str]
     wanted: list[str]
+    is_sample: bool = False
 
 
 class MatchOut(BaseModel):

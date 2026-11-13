@@ -24,3 +24,10 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 SMTP_FROM = os.getenv("SMTP_FROM", "")
 # Development helper: when SMTP is not set up, also return the reset link to the browser. Set to false in production.
 SHOW_RESET_LINK = os.getenv("SHOW_RESET_LINK", "true").lower() == "true"
+
+# Sample students (the 48 demo profiles created by seed.py)
+#   on   = always show them together with real users (good for demos)
+#   off  = only real users
+#   auto = show them only while there are fewer than SAMPLE_AUTO_THRESHOLD real users
+SAMPLE_USERS = os.getenv("SAMPLE_USERS", "on").lower()
+SAMPLE_AUTO_THRESHOLD = int(os.getenv("SAMPLE_AUTO_THRESHOLD", "10"))

@@ -67,3 +67,31 @@ def test_forgot_and_reset_password():
     # the link works only once
     assert client.post("/auth/reset-password", json={"token": token, "new_password": "another1"}).status_code == 400
     assert client.post("/auth/reset-password", json={"token": "garbage", "new_password": "another1"}).status_code == 400
+
+
+def test_sample_user_switch():
+    from app import config, models
+    from app.database import SessionLocal
+    from app.services import get_or_create_skills
+
+    db = SessionLocal()
+    db.add(models.User(name="Sam Sample", email="u99@example.com", password_hash="x", experience=2, availability=["Mon-E"],
+                       setup_done=True, is_sample=True, offered=get_or_create_skills(db, ["react"]), wanted=get_or_create_skills(db, ["python"])))
+    db.commit()
+    db.close()
+    h = signup("Real One", "real1@example.com")
+    setup(h, ["python"], ["react"], ["Mon-E"])
+    old = (config.SAMPLE_USERS, config.SAMPLE_AUTO_THRESHOLD)
+    try:
+        def samples_shown():
+            return any(m["peer"]["is_sample"] for m in client.get("/recommendations?n=50", headers=h).json())
+        config.SAMPLE_USERS = "on"
+        assert samples_shown()
+        config.SAMPLE_USERS = "off"
+        assert not samples_shown()
+        config.SAMPLE_USERS, config.SAMPLE_AUTO_THRESHOLD = "auto", 100      # few real users: samples fill the list
+        assert samples_shown()
+        config.SAMPLE_AUTO_THRESHOLD = 1                                      # enough real users: samples disappear
+        assert not samples_shown()
+    finally:
+        config.SAMPLE_USERS, config.SAMPLE_AUTO_THRESHOLD = old

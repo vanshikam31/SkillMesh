@@ -39,6 +39,7 @@ export default function Discover() {
           {matches && matches.length > 0 && <MeshGraph matches={matches} selected={selected} onSelect={select} />}
         </div>
         <h2 className="listh">Recommended peers</h2>
+        {matches && matches.some((m) => m.peer.is_sample) && <p className="hint" style={{ marginBottom: 12 }}>Profiles marked Sample are demo students who cannot reply.</p>}
         {matches === null && <p className="empty">Finding your peers...</p>}
         {matches && matches.length === 0 && <p className="empty card">No peers yet. Run <code>python backend/seed.py</code> to add sample students, or invite classmates to sign up.</p>}
         {matches && matches.map((m) => <PeerCard key={m.peer.id} match={m} selected={selected === m.peer.id} onSend={send} />)}

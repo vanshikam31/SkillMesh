@@ -4,9 +4,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import models  # noqa: F401  (registers the tables)
 from .config import CORS_ORIGINS
 from .database import Base, engine
+from .migrate import ensure_schema
 from .routers import auth, matching, profile, recommendations, requests, sessions
 
 Base.metadata.create_all(bind=engine)
+ensure_schema()
 
 app = FastAPI(title="SkillMesh API", version="1.0.0",
               description="Peer skill matching platform. Interactive docs are at /docs.")
@@ -18,11 +20,3 @@ for r in (auth, profile, recommendations, requests, sessions, matching):
 @app.get("/health", tags=["meta"])
 def health():
     return {"status": "ok"}
-
-@app.get("/")
-def root():
-    return {
-        "message": "Welcome to SkillMesh API",
-        "status": "running",
-        "docs": "/docs"
-    }
