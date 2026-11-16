@@ -5,7 +5,7 @@ from . import models  # noqa: F401  (registers the tables)
 from .config import CORS_ORIGINS
 from .database import Base, engine
 from .migrate import ensure_schema
-from .routers import auth, matching, profile, recommendations, requests, sessions
+from .routers import auth, chat, matching, profile, recommendations, requests, sessions
 
 Base.metadata.create_all(bind=engine)
 ensure_schema()
@@ -13,7 +13,7 @@ ensure_schema()
 app = FastAPI(title="SkillMesh API", version="1.0.0",
               description="Peer skill matching platform. Interactive docs are at /docs.")
 app.add_middleware(CORSMiddleware, allow_origins=CORS_ORIGINS, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
-for r in (auth, profile, recommendations, requests, sessions, matching):
+for r in (auth, profile, recommendations, requests, sessions, chat, matching):
     app.include_router(r.router)
 
 

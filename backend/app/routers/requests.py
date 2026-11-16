@@ -3,7 +3,7 @@ from skillmesh_ml import score_pair
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
-from .. import models, schemas
+from .. import config, models, schemas
 from ..database import get_db
 from ..deps import current_user
 from ..services import ml_profile, peer_out
@@ -37,6 +37,9 @@ def send_request(data: schemas.RequestIn, user: models.User = Depends(current_us
     if exists:
         raise HTTPException(409, "A request with this student already exists.")
     req = models.ConnectionRequest(sender_id=user.id, receiver_id=peer.id)
+    if peer.is_sample and config.SAMPLE_AUTO_REPLY:          # demo students accept straight away
+        req.status = "accepted"
+        db.add(models.Session(request=req))
     db.add(req)
     db.commit()
     return to_out(req, user)

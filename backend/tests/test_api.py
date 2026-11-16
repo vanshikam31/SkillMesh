@@ -95,3 +95,39 @@ def test_sample_user_switch():
         assert not samples_shown()
     finally:
         config.SAMPLE_USERS, config.SAMPLE_AUTO_THRESHOLD = old
+
+
+def test_chat_and_sample_auto_reply():
+    from app import models
+    from app.database import SessionLocal
+    from app.services import get_or_create_skills
+
+    a, b = signup("Chat A", "chata@example.com"), signup("Chat B", "chatb@example.com")
+    setup(a, ["python"], ["react"], ["Mon-E"])
+    setup(b, ["react"], ["python"], ["Mon-E"])
+    bid = client.get("/auth/me", headers=b).json()["id"]
+    req = client.post("/requests", headers=a, json={"receiver_id": bid}).json()
+    assert req["status"] == "pending"
+    client.post(f"/requests/{req['id']}/respond", headers=b, json={"action": "accept"})
+    sid = client.get("/sessions", headers=a).json()[0]["id"]
+
+    assert client.post(f"/sessions/{sid}/messages", headers=a, json={"text": "  Hi!  "}).json()["text"] == "Hi!"
+    client.post(f"/sessions/{sid}/messages", headers=b, json={"text": "Hello"})
+    msgs = client.get(f"/sessions/{sid}/messages", headers=a).json()
+    assert [m["mine"] for m in msgs] == [True, False]
+    assert client.get(f"/sessions/{sid}/messages?after={msgs[0]['id']}", headers=a).json()[0]["text"] == "Hello"
+    outsider = signup("Outsider", "outsider@example.com")
+    assert client.get(f"/sessions/{sid}/messages", headers=outsider).status_code == 404
+    assert client.post(f"/sessions/{sid}/messages", headers=a, json={"text": "   "}).status_code == 400
+
+    db = SessionLocal()
+    db.add(models.User(name="Demo Dee", email="u97@example.com", password_hash="x", experience=2, availability=["Mon-E"], setup_done=True,
+                       is_sample=True, offered=get_or_create_skills(db, ["react"]), wanted=get_or_create_skills(db, ["python"])))
+    db.commit()
+    sample_id = db.query(models.User).filter_by(email="u97@example.com").one().id
+    db.close()
+    assert client.post("/requests", headers=a, json={"receiver_id": sample_id}).json()["status"] == "accepted"
+    sess = [s for s in client.get("/sessions", headers=a).json() if s["peer"]["id"] == sample_id][0]
+    client.post(f"/sessions/{sess['id']}/messages", headers=a, json={"text": "Hi Dee, when are you free?"})
+    msgs = client.get(f"/sessions/{sess['id']}/messages", headers=a).json()
+    assert len(msgs) == 2 and msgs[1]["mine"] is False

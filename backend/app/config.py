@@ -31,3 +31,6 @@ SHOW_RESET_LINK = os.getenv("SHOW_RESET_LINK", "true").lower() == "true"
 #   auto = show them only while there are fewer than SAMPLE_AUTO_THRESHOLD real users
 SAMPLE_USERS = os.getenv("SAMPLE_USERS", "on").lower()
 SAMPLE_AUTO_THRESHOLD = int(os.getenv("SAMPLE_AUTO_THRESHOLD", "10"))
+
+# Demo helper: sample students accept requests and answer chat messages automatically (so one person can demo everything).
+SAMPLE_AUTO_REPLY = os.getenv("SAMPLE_AUTO_REPLY", "true").lower() == "true"

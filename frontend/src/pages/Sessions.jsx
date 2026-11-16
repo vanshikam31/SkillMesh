@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import api, { errorText } from "../api";
+import Chat from "../components/Chat";
 import { useToast } from "../components/Toast";
 import { slotLabel } from "../utils";
 
@@ -26,24 +27,32 @@ function Feedback({ session, onDone }) {
 
 export default function Sessions() {
   const [sessions, setSessions] = useState(null);
+  const [chats, setChats] = useState({});          // which session cards have the chat open
   const toast = useToast();
   const load = useCallback(() => api.get("/sessions").then((r) => setSessions(r.data)).catch((e) => toast(errorText(e))), [toast]);
   useEffect(() => { load(); }, [load]);
   const act = (req) => req.then(load).catch((e) => toast(errorText(e)));
+  const toggle = (id) => setChats((c) => ({ ...c, [id]: !c[id] }));
 
   if (sessions === null) return <p className="empty">Loading sessions...</p>;
-  if (!sessions.length) return <section className="card"><h2>Sessions</h2><p className="empty">Accept a request or send one from Discover. Connected peers appear here so you can pick a time.</p></section>;
+  if (!sessions.length) return <section className="card"><h2>Sessions</h2><p className="empty">Accept a request or send one from Discover. Connected peers appear here so you can chat and pick a time.</p></section>;
   return (
     <div className="sess">
       {sessions.map((s) => (
         <section className="card" key={s.id}>
           <h2>{s.peer.name}</h2><p className="sub">{Math.round(s.score * 100)}% match</p>
           <ul className="why">{s.reasons.map((x) => <li key={x}>{x}</li>)}</ul>
+          <div className="pact">
+            <button className="btn small" onClick={() => toggle(s.id)} aria-expanded={!!chats[s.id]}>{chats[s.id] ? "Hide chat" : "Open chat"}</button>
+            {s.slot && !s.completed && <a className="btn small" href="https://meet.new" target="_blank" rel="noopener noreferrer">Start video call</a>}
+          </div>
+          {s.slot && !s.completed && <p className="hint">The video call opens Google Meet. Copy the meeting link and paste it in the chat.</p>}
+          {chats[s.id] && <Chat sessionId={s.id} peerName={s.peer.name} />}
           {s.my_rating ? <p>Session done. You rated {s.peer.name} {s.my_rating} out of 5.{s.feedback ? ` Your note: ${s.feedback}` : ""}</p>
             : s.completed ? <Feedback session={s} onDone={load} />
             : <>
               {s.shared_slots.length ? (
-                <><p className="lbl">Pick a time you both have free</p>
+                <><p className="lbl" style={{ marginTop: 14 }}>Pick a time you both have free</p>
                   <div className="slots">{s.shared_slots.map((k) => <button key={k} className="slotpick" aria-pressed={s.slot === k} onClick={() => act(api.put(`/sessions/${s.id}/schedule`, { slot: k }))}>{slotLabel(k)}</button>)}</div></>
               ) : <p className="empty">No shared free time yet. Add more slots to your profile.</p>}
               {s.slot && <div className="pact"><span className="tag accepted">Scheduled: {slotLabel(s.slot)}</span><button className="btn" onClick={() => act(api.post(`/sessions/${s.id}/complete`))}>Mark session as done</button></div>}
