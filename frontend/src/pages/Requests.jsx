@@ -15,7 +15,7 @@ function Row({ r, onRespond }) {
             <button className="btn primary small" onClick={() => onRespond(r.id, "accept")}>Accept</button>
             <button className="btn small" onClick={() => onRespond(r.id, "decline")}>Decline</button>
           </>
-        ) : <span className={"tag " + r.status}>{r.status === "pending" ? "Waiting" : r.status === "accepted" ? "Accepted" : "Declined"}</span>}
+        ) : <><span className={"tag " + r.status}>{r.status === "pending" ? "Waiting" : r.status === "accepted" ? "Accepted" : "Declined"}</span>{r.status === "accepted" && <Link className="btn small" to="/sessions">Open chat</Link>}</>}
       </div>
     </div>
   );

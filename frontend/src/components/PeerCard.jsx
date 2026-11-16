@@ -7,7 +7,7 @@ export default function PeerCard({ match, selected, onSend }) {
   if (!st) action = <button className="btn primary" onClick={() => onSend(p)}>Send request</button>;
   else if (st === "pending_out") action = <button className="btn" disabled>Waiting for a reply</button>;
   else if (st === "pending_in") action = <Link className="btn" to="/requests">Reply to their request</Link>;
-  else if (st === "accepted") action = <Link className="btn" to="/sessions">Plan a session</Link>;
+  else if (st === "accepted") action = <Link className="btn" to="/sessions">Chat and plan session</Link>;
   else action = <span className="note">Request declined</span>;
   return (
     <article className={"peer" + (selected ? " sel" : "")} id={"peer-" + p.id}>

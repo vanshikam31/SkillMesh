@@ -131,3 +131,29 @@ def test_chat_and_sample_auto_reply():
     client.post(f"/sessions/{sess['id']}/messages", headers=a, json={"text": "Hi Dee, when are you free?"})
     msgs = client.get(f"/sessions/{sess['id']}/messages", headers=a).json()
     assert len(msgs) == 2 and msgs[1]["mine"] is False
+
+
+def test_reset_email_is_sent_when_smtp_is_configured(monkeypatch):
+    from app import config, emailer
+
+    sent = []
+
+    class FakeSMTP:
+        def __init__(self, host, port, timeout=None): sent.append(("connect", host, port))
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def ehlo(self): pass
+        def starttls(self, context=None): sent.append(("starttls",))
+        def login(self, user, pw): sent.append(("login", user))
+        def send_message(self, msg): sent.append(("message", msg["To"], msg.get_content()))
+
+    monkeypatch.setattr(emailer.smtplib, "SMTP", FakeSMTP)
+    monkeypatch.setattr(config, "SMTP_HOST", "smtp.example.com")
+    monkeypatch.setattr(config, "SMTP_USER", "me@example.com")
+    monkeypatch.setattr(config, "SMTP_PASSWORD", "app-password")
+    signup("Mailer", "mailer@example.com")
+    body = client.post("/auth/forgot-password", json={"email": "mailer@example.com"}).json()
+    assert "dev_reset_link" not in body                     # with SMTP set, the link goes to the inbox only
+    message = [s for s in sent if s[0] == "message"][0]
+    assert message[1] == "mailer@example.com" and "/reset-password?token=" in message[2]
+    assert ("starttls",) in sent and ("login", "me@example.com") in sent

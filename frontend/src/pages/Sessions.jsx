@@ -32,7 +32,9 @@ export default function Sessions() {
   const load = useCallback(() => api.get("/sessions").then((r) => setSessions(r.data)).catch((e) => toast(errorText(e))), [toast]);
   useEffect(() => { load(); }, [load]);
   const act = (req) => req.then(load).catch((e) => toast(errorText(e)));
-  const toggle = (id) => setChats((c) => ({ ...c, [id]: !c[id] }));
+  // After the rating the chat opens by itself, so the two students can keep talking.
+  const isOpen = (s) => chats[s.id] ?? !!s.my_rating;
+  const toggle = (s) => setChats((c) => ({ ...c, [s.id]: !isOpen(s) }));
 
   if (sessions === null) return <p className="empty">Loading sessions...</p>;
   if (!sessions.length) return <section className="card"><h2>Sessions</h2><p className="empty">Accept a request or send one from Discover. Connected peers appear here so you can chat and pick a time.</p></section>;
@@ -43,12 +45,12 @@ export default function Sessions() {
           <h2>{s.peer.name}</h2><p className="sub">{Math.round(s.score * 100)}% match</p>
           <ul className="why">{s.reasons.map((x) => <li key={x}>{x}</li>)}</ul>
           <div className="pact">
-            <button className="btn small" onClick={() => toggle(s.id)} aria-expanded={!!chats[s.id]}>{chats[s.id] ? "Hide chat" : "Open chat"}</button>
+            <button className="btn small" onClick={() => toggle(s)} aria-expanded={isOpen(s)}>{isOpen(s) ? "Hide chat" : s.my_rating ? "Continue chat" : "Open chat"}</button>
             {s.slot && !s.completed && <a className="btn small" href="https://meet.new" target="_blank" rel="noopener noreferrer">Start video call</a>}
           </div>
           {s.slot && !s.completed && <p className="hint">The video call opens Google Meet. Copy the meeting link and paste it in the chat.</p>}
-          {chats[s.id] && <Chat sessionId={s.id} peerName={s.peer.name} />}
-          {s.my_rating ? <p>Session done. You rated {s.peer.name} {s.my_rating} out of 5.{s.feedback ? ` Your note: ${s.feedback}` : ""}</p>
+          {isOpen(s) && <Chat sessionId={s.id} peerName={s.peer.name} />}
+          {s.my_rating ? <p style={{ marginTop: 12 }}>Session done. You rated {s.peer.name} {s.my_rating} out of 5.{s.feedback ? ` Your note: ${s.feedback}` : ""} You can keep chatting above.</p>
             : s.completed ? <Feedback session={s} onDone={load} />
             : <>
               {s.shared_slots.length ? (
