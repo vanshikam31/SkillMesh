@@ -6,6 +6,7 @@ import Navbar from "./components/Navbar";
 import { useToast } from "./components/Toast";
 import Discover from "./pages/Discover";
 import HowItWorks from "./pages/HowItWorks";
+import ChatPage from "./pages/ChatPage";
 import Landing from "./pages/Landing";
 import Requests from "./pages/Requests";
 import ResetPassword from "./pages/ResetPassword";
@@ -16,16 +17,18 @@ function AppShell({ children }) {
   const toast = useToast();
   const { pathname } = useLocation();
   const [requests, setRequests] = useState([]);
+  const [unread, setUnread] = useState(0);
   const load = useCallback(() => api.get("/requests").then((r) => setRequests(r.data)).catch(() => {}), []);
-  useEffect(() => { load(); const t = setInterval(load, 8000); return () => clearInterval(t); }, [load, pathname]);   // reload on every page change, plus simple polling
+  const loadUnread = useCallback(() => api.get("/sessions/unread").then((r) => setUnread(r.data.unread)).catch(() => {}), []);
+  useEffect(() => { load(); loadUnread(); const t = setInterval(() => { load(); loadUnread(); }, 6000); return () => clearInterval(t); }, [load, loadUnread, pathname]);   // reload on every page change, plus simple polling
   const respond = async (id, action) => {
-    try { await api.post(`/requests/${id}/respond`, { action }); toast(action === "accept" ? "Accepted. Pick a time under Sessions." : "Request declined."); load(); }
+    try { await api.post(`/requests/${id}/respond`, { action }); toast(action === "accept" ? "Accepted. You can now chat under Sessions." : "Request rejected."); load(); }
     catch (e) { toast(errorText(e)); }
   };
   const pending = requests.filter((r) => r.direction === "in" && r.status === "pending").length;
   return (
     <>
-      <Navbar pending={pending} />
+      <Navbar pending={pending} unread={unread} />
       <main>{typeof children === "function" ? children({ requests, respond }) : children}</main>
     </>
   );
@@ -48,6 +51,7 @@ export default function App() {
       <Route path="/discover" element={<Protected><AppShell><Discover /></AppShell></Protected>} />
       <Route path="/requests" element={<Protected><AppShell>{({ requests, respond }) => <Requests requests={requests} onRespond={respond} />}</AppShell></Protected>} />
       <Route path="/sessions" element={<Protected><AppShell><Sessions /></AppShell></Protected>} />
+      <Route path="/chat" element={<Protected><AppShell><ChatPage /></AppShell></Protected>} />
       <Route path="/how-it-works" element={<Protected><AppShell><HowItWorks /></AppShell></Protected>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

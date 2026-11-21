@@ -2,9 +2,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../AuthContext";
 import Logo from "./Logo";
 
-const links = [["/discover", "Discover"], ["/requests", "Requests"], ["/sessions", "Sessions"], ["/how-it-works", "How matching works"]];
+const links = [["/discover", "Discover"], ["/requests", "Requests"], ["/sessions", "Sessions"], ["/chat", "Chat"], ["/how-it-works", "How matching works"]];
 
-export default function Navbar({ pending = 0 }) {
+export default function Navbar({ pending = 0, unread = 0 }) {
   const { logout } = useAuth();
   const nav = useNavigate();
   return (
@@ -12,7 +12,7 @@ export default function Navbar({ pending = 0 }) {
       <div className="brand"><Logo />SkillMesh</div>
       <nav id="tabs" aria-label="Main">
         {links.map(([to, label]) => (
-          <NavLink key={to} to={to} className="tab">{label}{to === "/requests" && pending ? ` (${pending})` : ""}</NavLink>
+          <NavLink key={to} to={to} className="tab">{label}{to === "/requests" && pending ? ` (${pending})` : ""}{to === "/chat" && unread ? ` (${unread})` : ""}</NavLink>
         ))}
         <button className="tab" onClick={() => { logout(); nav("/"); }}>Log out</button>
       </nav>
