@@ -19,3 +19,17 @@ def test_top_matches_sorted_and_excludes_self():
 def test_beats_keyword_baseline():
     r = evaluate(generate_users(), 5)
     assert r["skillmesh"] > r["keyword"]
+
+
+def test_overlap_and_categories():
+    from skillmesh_ml import category_of, skill_overlap
+    me = {"id": 1, "offered": ["python"], "wanted": ["react"]}
+    mutual = {"id": 2, "offered": ["reactjs"], "wanted": ["python programming"]}
+    one_way = {"id": 3, "offered": ["react"], "wanted": ["guitar"]}
+    none = {"id": 4, "offered": ["guitar"], "wanted": ["french"]}
+    o = skill_overlap(me, mutual)
+    assert o["learn"] == ["reactjs"] and o["teach"] == ["python programming"]
+    o = skill_overlap(me, one_way)
+    assert o["learn"] == ["react"] and o["teach"] == []
+    assert skill_overlap(me, none) == {"learn": [], "teach": []}
+    assert category_of("reactjs") == "Programming" and category_of("figma") == "Design and Media" and category_of("underwater basket weaving") == "Other"

@@ -81,3 +81,5 @@ class Message(Base):
     sender_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     text: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)       # read by the other student?
+    sender = relationship("User", lazy="joined")

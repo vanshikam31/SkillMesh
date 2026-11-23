@@ -39,3 +39,12 @@ def explain(me: dict, peer: dict) -> list[str]:
     if not teach and not learn:
         out.insert(0, "Similar profile, no direct skill overlap yet")
     return out[:3]
+
+
+def skill_overlap(me: dict, peer: dict) -> dict:
+    """Which skills actually match, written the way the PEER wrote them.
+    learn = peer's offered skills that I want.   teach = peer's wanted skills that I offer.
+    Both lists filled  -> mutual (two-way) match.   Otherwise -> one-way or no overlap."""
+    learn = [o for o in peer["offered"] if any(similarity(w, o) for w in me["wanted"])]
+    teach = [q for q in peer["wanted"] if any(similarity(q, o) for o in me["offered"])]
+    return {"learn": learn, "teach": teach}

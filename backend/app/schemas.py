@@ -41,6 +41,7 @@ class PeerOut(BaseModel):
     offered: list[str]
     wanted: list[str]
     is_sample: bool = False
+    categories: list[str] = []
 
 
 class MatchOut(BaseModel):
@@ -48,7 +49,11 @@ class MatchOut(BaseModel):
     score: float
     parts: dict[str, float]
     reasons: list[str]
-    request_status: str | None = None     # None, pending_out, pending_in, accepted, declined
+    request_status: str | None = None     # None, pending_out, pending_in, accepted, declined (shown as Rejected)
+    learn: list[str] = []                 # their offered skills that I want
+    teach: list[str] = []                 # their wanted skills that I offer
+    mutual: bool = False                  # True when both lists above are filled
+    session_id: int | None = None         # set once the request was accepted
 
 
 class RequestIn(BaseModel):
@@ -56,7 +61,7 @@ class RequestIn(BaseModel):
 
 
 class RespondIn(BaseModel):
-    action: str = Field(pattern="^(accept|decline)$")
+    action: str = Field(pattern="^(accept|decline|reject)$")
 
 
 class RequestOut(BaseModel):
@@ -66,6 +71,7 @@ class RequestOut(BaseModel):
     peer: PeerOut
     score: float
     reasons: list[str]
+    session_id: int | None = None
 
 
 class SessionOut(BaseModel):
@@ -105,5 +111,16 @@ class MessageIn(BaseModel):
 class MessageOut(BaseModel):
     id: int
     mine: bool
+    sender_name: str
     text: str
     created_at: str
+    is_read: bool = False
+
+
+class ConversationOut(BaseModel):
+    session_id: int
+    peer: PeerOut
+    last_message: str | None = None
+    last_at: str | None = None
+    last_mine: bool | None = None
+    unread: int = 0

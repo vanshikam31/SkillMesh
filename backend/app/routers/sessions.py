@@ -27,6 +27,8 @@ def get_my_session(session_id: int, me: models.User, db: Session) -> models.Sess
     s = db.get(models.Session, session_id)
     if not s or me.id not in (s.request.sender_id, s.request.receiver_id):
         raise HTTPException(404, "Session not found.")
+    if s.request.status != "accepted":      # only accepted connections may use the session and its chat
+        raise HTTPException(403, "This connection is not accepted.")
     return s
 
 

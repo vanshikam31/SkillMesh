@@ -2,6 +2,8 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from skillmesh_ml import category_of
+
 from . import models, schemas
 
 
@@ -13,7 +15,8 @@ def ml_profile(u: models.User) -> dict:
 
 def peer_out(u: models.User) -> schemas.PeerOut:
     return schemas.PeerOut(id=u.id, name=u.name, experience=u.experience, rating=round(u.rating_avg, 1),
-                           rating_count=u.rating_count, offered=[s.name for s in u.offered], wanted=[s.name for s in u.wanted], is_sample=bool(u.is_sample))
+                           rating_count=u.rating_count, offered=[s.name for s in u.offered], wanted=[s.name for s in u.wanted], is_sample=bool(u.is_sample),
+                           categories=sorted({category_of(s.name) for s in u.offered + u.wanted}))
 
 
 def profile_out(u: models.User) -> schemas.ProfileOut:
@@ -31,7 +34,7 @@ def get_or_create_skills(db: Session, names: list[str]) -> list[models.Skill]:
         seen.add(name)
         skill = db.scalar(select(models.Skill).where(models.Skill.name == name))
         if not skill:
-            skill = models.Skill(name=name)
+            skill = models.Skill(name=name, category=category_of(name))
             db.add(skill)
         skills.append(skill)
     return skills

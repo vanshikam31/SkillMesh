@@ -1,0 +1,116 @@
+--- a/frontend/src/App.jsx
++++ b/frontend/src/App.jsx
+@@ -6,6 +6,7 @@
+ import { useToast } from "./components/Toast";
+ import Discover from "./pages/Discover";
+ import HowItWorks from "./pages/HowItWorks";
++import ChatPage from "./pages/ChatPage";
+ import Landing from "./pages/Landing";
+ import Requests from "./pages/Requests";
+ import ResetPassword from "./pages/ResetPassword";
+@@ -50,6 +51,7 @@
+       <Route path="/discover" element={<Protected><AppShell><Discover /></AppShell></Protected>} />
+       <Route path="/requests" element={<Protected><AppShell>{({ requests, respond }) => <Requests requests={requests} onRespond={respond} />}</AppShell></Protected>} />
+       <Route path="/sessions" element={<Protected><AppShell><Sessions /></AppShell></Protected>} />
++      <Route path="/chat" element={<Protected><AppShell><ChatPage /></AppShell></Protected>} />
+       <Route path="/how-it-works" element={<Protected><AppShell><HowItWorks /></AppShell></Protected>} />
+       <Route path="*" element={<Navigate to="/" replace />} />
+     </Routes>
+--- a/frontend/src/components/Navbar.jsx
++++ b/frontend/src/components/Navbar.jsx
+@@ -2,7 +2,7 @@
+ import { useAuth } from "../AuthContext";
+ import Logo from "./Logo";
+ 
+-const links = [["/discover", "Discover"], ["/requests", "Requests"], ["/sessions", "Sessions"], ["/how-it-works", "How matching works"]];
++const links = [["/discover", "Discover"], ["/requests", "Requests"], ["/sessions", "Sessions"], ["/chat", "Chat"], ["/how-it-works", "How matching works"]];
+ 
+ export default function Navbar({ pending = 0, unread = 0 }) {
+   const { logout } = useAuth();
+@@ -12,7 +12,7 @@
+       <div className="brand"><Logo />SkillMesh</div>
+       <nav id="tabs" aria-label="Main">
+         {links.map(([to, label]) => (
+-          <NavLink key={to} to={to} className="tab">{label}{to === "/requests" && pending ? ` (${pending})` : ""}{to === "/sessions" && unread ? ` (${unread})` : ""}</NavLink>
++          <NavLink key={to} to={to} className="tab">{label}{to === "/requests" && pending ? ` (${pending})` : ""}{to === "/chat" && unread ? ` (${unread})` : ""}</NavLink>
+         ))}
+         <button className="tab" onClick={() => { logout(); nav("/"); }}>Log out</button>
+       </nav>
+--- a/frontend/src/components/ChatCenter.jsx
++++ b/frontend/src/components/ChatCenter.jsx
+@@ -6,6 +6,7 @@
+ /* Conversation list on the left (all accepted connections), the open conversation on the right. */
+ export default function ChatCenter({ activeId, onSelect }) {
+   const [convs, setConvs] = useState(null);
++  const [query, setQuery] = useState("");
+   const load = useCallback(() => api.get("/sessions/conversations").then((r) => setConvs(r.data)).catch(() => {}), []);
+   useEffect(() => { load(); const t = setInterval(load, 5000); return () => clearInterval(t); }, [load]);    // latest message and unread counts
+ 
+@@ -16,10 +17,14 @@
+     </section>
+   );
+   const active = convs.find((c) => c.session_id === activeId);
++  const visible = convs.filter((c) => c.peer.name.toLowerCase().includes(query.trim().toLowerCase()));
+   return (
+     <div className={"chatcenter" + (active ? " has-active" : "")}>
+       <aside className="convlist" aria-label="Conversations">
+-        {convs.map((c) => (
++        <div className="conv-search">
++          <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search conversations" aria-label="Search conversations" />
++        </div>
++        {visible.length === 0 ? <p className="empty conv-empty">No conversations match your search.</p> : visible.map((c) => (
+           <button key={c.session_id} className={"conv" + (c.session_id === activeId ? " on" : "")} onClick={() => onSelect(c.session_id)}>
+             <span className="pico sm">{initials(c.peer.name)}</span>
+             <span className="convtext">
+--- a/frontend/src/components/Chat.jsx
++++ b/frontend/src/components/Chat.jsx
+@@ -62,7 +62,7 @@
+         ))}
+       </div>
+       <form className="chatform" onSubmit={send}>
+-        <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Type a message and press Enter" maxLength={1000} aria-label="Message" autoFocus />
++        <textarea rows="1" value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); e.currentTarget.form.requestSubmit(); } }} placeholder="Type a message (Enter to send, Shift + Enter for a new line)" maxLength={1000} aria-label="Message" autoFocus />
+         <button className="btn primary small" type="submit" disabled={busy}>Send</button>
+       </form>
+     </div>
+--- a/frontend/src/styles.css
++++ b/frontend/src/styles.css
+@@ -201,3 +201,14 @@
+   .backbtn{display:inline-block}
+   .rowlabel{min-width:100%}
+ }
++
++
++/* Dedicated Chat page */
++.chatpage{width:min(1100px,100%);margin:0 auto}
++.chatpage-head{display:flex;align-items:flex-end;justify-content:space-between;margin:4px 0 16px}
++.chatpage-head h1{margin:0 0 4px}
++.conv-search{position:sticky;top:0;z-index:1;padding:10px;border-bottom:1px solid var(--line);background:var(--surface)}
++.conv-search input{width:100%;min-width:0;padding:9px 11px;border:2px solid var(--edge);border-radius:11px;background:var(--bg);color:var(--ink)}
++.conv-empty{padding:16px}
++.chatform textarea{flex:1;min-width:0;min-height:40px;max-height:120px;resize:vertical;padding:9px 11px;border:2px solid var(--edge);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit}
++@media(max-width:860px){.chatpage-head{margin-top:0}.chatpage-head h1{font-size:1.5rem}}
+--- /dev/null
++++ b/frontend/src/pages/ChatPage.jsx
+@@ -0,0 +1,21 @@
++import { useState } from "react";
++import { useSearchParams } from "react-router-dom";
++import ChatCenter from "../components/ChatCenter";
++
++/** Dedicated inbox page for accepted SkillMesh connections. */
++export default function ChatPage() {
++  const [params] = useSearchParams();
++  const requestedId = Number(params.get("session")) || null;
++  const [active, setActive] = useState(requestedId);
++  return (
++    <section className="chatpage">
++      <div className="chatpage-head">
++        <div>
++          <h1>Messages</h1>
++          <p className="sub">Chat privately with students whose connection requests have been accepted.</p>
++        </div>
++      </div>
++      <ChatCenter activeId={active} onSelect={setActive} />
++    </section>
++  );
++}

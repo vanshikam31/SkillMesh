@@ -157,3 +157,92 @@ def test_reset_email_is_sent_when_smtp_is_configured(monkeypatch):
     message = [s for s in sent if s[0] == "message"][0]
     assert message[1] == "mailer@example.com" and "/reset-password?token=" in message[2]
     assert ("starttls",) in sent and ("login", "me@example.com") in sent
+
+
+def _uid(h):
+    return client.get("/auth/me", headers=h).json()["id"]
+
+
+def _profile(h, name, offered, wanted, slots=("Mon-E",)):
+    r = client.put("/profile", headers=h, json={"name": name, "experience": 2, "offered": offered, "wanted": wanted, "availability": list(slots)})
+    assert r.status_code == 200
+
+
+def test_mutual_and_explore_sections():
+    me = signup("Disc Me", "discme@example.com")
+    m = signup("Mutual Mia", "mia@example.com")
+    o1 = signup("Oneway Omar", "omar@example.com")
+    o2 = signup("Other Olga", "olga@example.com")
+    _profile(me, "Disc Me", ["python"], ["react"])
+    _profile(m, "Mutual Mia", ["reactjs"], ["python programming"])      # offers what I want AND wants what I offer
+    _profile(o1, "Oneway Omar", ["react"], ["guitar"])                   # offers what I want, wants something else
+    _profile(o2, "Other Olga", ["guitar"], ["french"])                   # no overlap at all
+    ids = {"m": _uid(m), "o1": _uid(o1), "o2": _uid(o2), "me": _uid(me)}
+
+    mutual = client.get("/recommendations/mutual", headers=me).json()
+    explore = client.get("/recommendations/explore", headers=me).json()
+    mutual_ids, explore_ids = {x["peer"]["id"] for x in mutual}, {x["peer"]["id"] for x in explore}
+    assert ids["m"] in mutual_ids and ids["m"] not in explore_ids
+    assert {ids["o1"], ids["o2"]} <= explore_ids and not ({ids["o1"], ids["o2"]} & mutual_ids)
+    assert not (mutual_ids & explore_ids) and ids["me"] not in mutual_ids | explore_ids      # nobody twice, never myself
+    mia = [x for x in mutual if x["peer"]["id"] == ids["m"]][0]
+    assert mia["mutual"] and mia["learn"] == ["reactjs"] and mia["teach"] == ["python programming"]
+    omar = [x for x in explore if x["peer"]["id"] == ids["o1"]][0]
+    assert not omar["mutual"] and omar["learn"] == ["react"] and omar["teach"] == []
+    assert omar["peer"]["offered"] == ["react"] and omar["peer"]["wanted"] == ["guitar"]
+
+    def explore_ids_for(**params):
+        return {x["peer"]["id"] for x in client.get("/recommendations/explore", headers=me, params=params).json()}
+    assert explore_ids_for(q="olga") == {ids["o2"]}                                   # search by username
+    assert ids["o2"] in explore_ids_for(category="Music") and ids["o1"] in explore_ids_for(category="Music")
+    assert explore_ids_for(offered="guitar") >= {ids["o2"]} and ids["o1"] not in explore_ids_for(offered="guitar")
+    assert ids["o2"] in explore_ids_for(wanted="french") and ids["o1"] not in explore_ids_for(wanted="french")
+    assert "Music" in client.get("/skills/categories").json()
+
+
+def test_requests_rules_and_chat_inbox():
+    a, b = signup("Inbox A", "inboxa@example.com"), signup("Inbox B", "inboxb@example.com")
+    _profile(a, "Inbox A", ["python"], ["react"])
+    _profile(b, "Inbox B", ["react"], ["python"])
+    aid, bid = _uid(a), _uid(b)
+    assert client.post("/requests", headers=a, json={"receiver_id": aid}).status_code == 400          # not to myself
+    req = client.post("/requests", headers=a, json={"receiver_id": bid}).json()
+    assert client.post("/requests", headers=a, json={"receiver_id": bid}).status_code == 409          # no duplicates
+    assert client.post("/requests", headers=b, json={"receiver_id": aid}).status_code == 409          # ...in either direction
+    assert client.post(f"/requests/{req['id']}/respond", headers=a, json={"action": "accept"}).status_code == 404   # sender cannot accept
+
+    # nothing to chat about before the request is accepted
+    assert client.get("/sessions/conversations", headers=a).json() == []
+    assert client.post(f"/requests/{req['id']}/respond", headers=b, json={"action": "accept"}).json()["session_id"]
+
+    sid = client.get("/sessions", headers=a).json()[0]["id"]
+    for text in ("Hi B!", "Are you free on Monday?"):
+        client.post(f"/sessions/{sid}/messages", headers=a, json={"text": text})
+    inbox_b = client.get("/sessions/conversations", headers=b).json()
+    assert len(inbox_b) == 1 and inbox_b[0]["unread"] == 2 and inbox_b[0]["last_message"] == "Are you free on Monday?" and inbox_b[0]["last_mine"] is False
+    assert client.get("/sessions/conversations", headers=a).json()[0]["unread"] == 0                  # my own messages are not unread
+    assert client.get("/sessions/unread", headers=b).json()["unread"] == 2
+    msgs = client.get(f"/sessions/{sid}/messages", headers=b).json()
+    assert msgs[0]["sender_name"] == "Inbox A" and msgs[0]["is_read"] is False
+
+    outsider = signup("Inbox C", "inboxc@example.com")
+    assert client.post(f"/sessions/{sid}/read", headers=outsider).status_code == 404                  # cannot touch other people's chats
+    assert client.get(f"/sessions/{sid}/messages", headers=outsider).status_code == 404
+    assert client.post(f"/sessions/{sid}/messages", headers=outsider, json={"text": "hi"}).status_code == 404
+
+    assert client.post(f"/sessions/{sid}/read", headers=b).json()["marked"] == 2
+    assert client.get("/sessions/unread", headers=b).json()["unread"] == 0
+    client.post(f"/sessions/{sid}/messages", headers=b, json={"text": "Yes, Monday works"})
+    assert client.get("/sessions/conversations", headers=a).json()[0]["unread"] == 1
+    # messages survive logout and login: they live in the database
+    again = client.post("/auth/login", json={"email": "inboxa@example.com", "password": "secret1"}).json()["token"]
+    assert len(client.get(f"/sessions/{sid}/messages", headers={"Authorization": "Bearer " + again}).json()) == 3
+
+
+def test_reject_request():
+    a, b = signup("Rej A", "reja@example.com"), signup("Rej B", "rejb@example.com")
+    _profile(a, "Rej A", ["python"], ["react"])
+    _profile(b, "Rej B", ["react"], ["python"])
+    req = client.post("/requests", headers=a, json={"receiver_id": _uid(b)}).json()
+    assert client.post(f"/requests/{req['id']}/respond", headers=b, json={"action": "reject"}).json()["status"] == "declined"
+    assert client.get("/sessions/conversations", headers=a).json() == []                              # rejected: no chat

@@ -15,7 +15,8 @@ def to_out(req: models.ConnectionRequest, me: models.User) -> schemas.RequestOut
     peer = req.receiver if req.sender_id == me.id else req.sender
     m = score_pair(ml_profile(me), ml_profile(peer))
     return schemas.RequestOut(id=req.id, direction="out" if req.sender_id == me.id else "in", status=req.status,
-                              peer=peer_out(peer), score=round(m["score"], 4), reasons=m["reasons"])
+                              peer=peer_out(peer), score=round(m["score"], 4), reasons=m["reasons"],
+                              session_id=req.session.id if req.session else None)
 
 
 @router.get("", response_model=list[schemas.RequestOut])

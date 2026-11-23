@@ -1,6 +1,7 @@
 README.md
 pyproject.toml
 skillmesh_ml/__init__.py
+skillmesh_ml/categories.py
 skillmesh_ml/evaluation.py
 skillmesh_ml/matcher.py
 skillmesh_ml/preprocessing.py

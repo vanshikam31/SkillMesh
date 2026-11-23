@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from skillmesh_ml import CATEGORIES
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -24,6 +25,11 @@ def update_profile(data: schemas.ProfileIn, user: models.User = Depends(current_
     user.setup_done = bool(user.offered and user.wanted)
     db.commit()
     return profile_out(user)
+
+
+@router.get("/skills/categories", response_model=list[str])
+def skill_categories():
+    return list(CATEGORIES)
 
 
 @router.get("/skills", response_model=list[str])
